@@ -1,5 +1,6 @@
 package tests;
 
+import base.TestBase;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,22 +10,19 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class GosslingatorTest {
-    WebDriver driver;
+import static org.junit.Assert.assertEquals;
+
+public class GosslingatorTest extends TestBase {
+
+   private String actualNumberOfRyans;
 
     @Before
-    public void setUp(){
-        System.setProperty("webdriver.chrome.driver", "chromedriver74.exe");
-        //0. spustit prehliadac
-        driver = new ChromeDriver();
-        //1. otvorit stranku
-        driver.get("http://localhost:8888/gosslingator.php");
+    public void openPage (){
+
+
+        driver.get(BASE_URL + "/gosslingator.php");
     }
-    @After
-    public void tearDown(){
-        driver.close();
-        driver.quit();
-    }
+
 
 
 
@@ -33,17 +31,17 @@ public class GosslingatorTest {
 
         //2. najst a clicknut na tlacidlo pridat
         WebElement addRyanButton = driver.findElement(By.id("addRyan"));
-        addRyanButton.click();
-        addRyanButton.click();
-        addRyanButton.click();
+        addRyan();
+        addRyan();
+        addRyan();
         //3. overit ci sa zobrazi pocitanie ryanov
-        String actualNumberOfRyans =  driver.findElement(By.cssSelector("div.ryan-counter h2")).getText();
-        Assert.assertEquals("3", actualNumberOfRyans);
+        String actualNumberOfRyans =  getRyanCounterNumber();
+        assertEquals("3", getRyanCounterNumber());
 
         //vypisem si do console akutalny pocet z pocitadla ryanov
         System.out.println("Number of ryans:" + driver.findElement(By.cssSelector("div.ryan-counter h2")).getText());
 
-        Assert.assertEquals("ryans", driver.findElement(By.cssSelector("div.ryan-counter h3")).getText());
+        assertEquals("ryans", getCounterDescription());
         //4.zatvorit prehliadac
 
 
@@ -104,7 +102,7 @@ public class GosslingatorTest {
         addRyanButton.click();
         addRyanButton.click();
 
-        Assert.assertEquals("50", driver.findElement(By.cssSelector("div.ryan-counter h2")).getText());
+        assertEquals("50", driver.findElement(By.cssSelector("div.ryan-counter h2")).getText());
 
         System.out.println(driver.findElement(By.cssSelector("div.ryan-counter h2")).getText());
 
@@ -126,26 +124,32 @@ public class GosslingatorTest {
             String actualNumberOfRyans = driver.findElement(By.id("ryanCounter")).getText();
             //porovnam skutocnu hodnotu zo stranky s hodnotou indexu +1
             //index si musim  premenit na string aby so imohol porovnat
-            Assert.assertEquals(String.valueOf(i + 1), actualNumberOfRyans);
+            assertEquals(String.valueOf(i + 1), actualNumberOfRyans);
 
 
             //overit sklonovanie pomocou podmienky
             String actualDescription = driver.findElement(By.cssSelector("div.ryan-counter h3")).getText();
             if (i+1==1) {
-                Assert.assertEquals("ryan", actualDescription);
+                assertEquals("ryan", actualDescription);
             }
             if (i + 1 >=2){
-                Assert.assertEquals("ryans",actualDescription);
+                assertEquals("ryans",actualDescription);
             }
+            //overim si pocet obrazkov ryana
+            int numberOfRyanImages = driver.findElements(By.cssSelector("img")).size();
+            Assert.assertEquals(i+1,numberOfRyanImages);
 
             System.out.println("index i = " + i);
             System.out.println("pocet ryanov = " +actualNumberOfRyans);
+
+
+
         }
 
 
 
 
-        Assert.assertEquals("NUMBER OF\n" +
+        assertEquals("NUMBER OF\n" +
                         "RYANS\n" +
                         "IS TOO DAMN\n" +
                         "HIGH" , driver.findElement(By.cssSelector("h1.tooManyRyans")).getText());
@@ -180,6 +184,34 @@ public class GosslingatorTest {
 
 
     }
+
+    @Test
+    public void itShouldDisplanyNoRyans(){
+        Assert.assertEquals(
+                0,
+                driver.findElements(By.cssSelector("img")).size());
+
+
+    }
+
+    private void addRyan(){
+        WebElement ryanButton = driver.findElement(By.id("addRyan"));
+       ryanButton.click();
+
+    }
+
+            private String getRyanCounterNumber(){
+            return driver.findElement(By.id("ryanCounter")).getText();
+            }
+
+            private String getCounterDescription(){
+            return driver.findElement(By.cssSelector("div.ryan-counter h3")).getText();
+            }
+
+            private String getNumberOfRyanImages(){
+            return driver.findElement(By.cssSelector("div.ryan-counter h2")).getText();
+            }
+
 
 
 }
